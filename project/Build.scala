@@ -1,4 +1,4 @@
-import com.typesafe.sbt.SbtPgp
+
 import sbt.Keys._
 import sbt._
 
@@ -20,10 +20,10 @@ object Build extends AutoPlugin {
   def travisBuildNumber = System.getenv("TRAVIS_BUILD_NUMBER")
 
   override def trigger = allRequirements
-  override def projectSettings = publishingSettings ++ Seq(
+  override def projectSettings = Seq(
     organization := org,
     name := "scrimage",
-    scalaVersion := "2.12.8",
+    scalaVersion := "2.13.1",
     crossScalaVersions := Seq("2.12.8", "2.13.0"),
     parallelExecution in Test := false,
     scalacOptions := Seq("-unchecked", "-encoding", "utf8"),
@@ -36,55 +36,4 @@ object Build extends AutoPlugin {
     )
   )
 
-  val publishingSettings = Seq(
-    publishMavenStyle := true,
-    publishArtifact in Test := false,
-    SbtPgp.autoImport.useGpg := true,
-    SbtPgp.autoImport.useGpgAgent := true,
-    if (isTravis) {
-      credentials += Credentials(
-        "Sonatype Nexus Repository Manager",
-        "oss.sonatype.org",
-        sys.env.getOrElse("OSSRH_USERNAME", ""),
-        sys.env.getOrElse("OSSRH_PASSWORD", "")
-      )
-    } else {
-      credentials += Credentials(Path.userHome / ".sbt" / "credentials.sbt")
-    },
-    if (isTravis) {
-      version := s"3.0.0.$travisBuildNumber-SNAPSHOT"
-    } else {
-      version := "3.0.0-RC5"
-    },
-    publishTo := {
-      val nexus = "https://oss.sonatype.org/"
-      if (isTravis) {
-        Some("snapshots" at s"${nexus}content/repositories/snapshots")
-      } else {
-        Some("releases" at s"${nexus}service/local/staging/deploy/maven2")
-      }
-    },
-    pomExtra := {
-      <url>https://github.com/sksamuel/scrimage</url>
-        <licenses>
-          <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-          </license>
-        </licenses>
-        <scm>
-          <connection>scm:git:git@github.com:sksamuel/scrimage.git</connection>
-          <developerConnection>scm:git:git@github.com:sksamuel/scrimage.git</developerConnection>
-          <url>git@github.com:sksamuel/scrimage.git</url>
-        </scm>
-        <developers>
-          <developer>
-            <name>Stephen Samuel</name>
-            <email>sam@sksamuel.com</email>
-            <timezone>GMT</timezone>
-          </developer>
-        </developers>
-    }
-  )
 }

@@ -1,15 +1,33 @@
+import sbt.Keys.{publishArtifact, publishMavenStyle}
+
+
+lazy val commonSettings = Seq(
+  version := "3.0.0-sevts",
+  publishMavenStyle := true,
+
+  publishArtifact in Test := false,
+  licenses      += ("Apache-2.0", url("http://www.apache.org/licenses/")),
+  pomIncludeRepository := { _ => false },
+
+  publishMavenStyle       := true,
+  bintrayOrganization     := None,
+  bintrayRepository := "scrimage"
+)
+
 lazy val root = Project("scrimage", file("."))
   .settings(
-    publish := {},
-    publishArtifact := false,
-    name := "scrimage"
+    name := "scrimage",
+    licenses      += ("Apache-2.0", url("http://www.apache.org/licenses/"))
   )
+  .settings(commonSettings)
   .aggregate(core, scala, io, filters)
 
 lazy val core = Project("scrimage-core", file("scrimage-core"))
   .settings(
-    name := "scrimage-core"
+    name := "scrimage-core",
+    licenses      += ("Apache-2.0", url("http://www.apache.org/licenses/"))
   )
+  .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
       "com.twelvemonkeys.imageio" % "imageio-core"        % TwelveMonkeysVersion,
@@ -26,10 +44,13 @@ lazy val core = Project("scrimage-core", file("scrimage-core"))
 
 lazy val scala = Project("scrimage-scala", file("scrimage-scala"))
   .settings(name := "scrimage-scala")
+  .settings(commonSettings)
+  .settings(licenses      += ("Apache-2.0", url("http://www.apache.org/licenses/")))
   .dependsOn(core)
 
 lazy val io = Project("scrimage-io-extra", file("scrimage-io-extra"))
   .settings(name := "scrimage-io-extra")
+  .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
       "com.twelvemonkeys.imageio" % "imageio-bmp"       % TwelveMonkeysVersion,
@@ -45,14 +66,24 @@ lazy val io = Project("scrimage-io-extra", file("scrimage-io-extra"))
       "com.twelvemonkeys.imageio" % "imageio-tiff"      % TwelveMonkeysVersion,
       "com.twelvemonkeys.imageio" % "imageio-tga"       % TwelveMonkeysVersion,
       "com.twelvemonkeys.imageio" % "imageio-thumbsdb"  % TwelveMonkeysVersion
-    )
+    ),
+    sources in (Compile, doc) := Seq.empty,
+    publishArtifact in (Compile, packageDoc) := false,
+    licenses      += ("Apache-2.0", url("http://www.apache.org/licenses/"))
   ).dependsOn(core)
 
 lazy val filters = Project("scrimage-filters", file("scrimage-filters"))
   .dependsOn(core)
+  .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
       "commons-io" % "commons-io" % "2.4"
     ),
-    name := "scrimage-filters"
+    name := "scrimage-filters",
+    sources in (Compile, doc) := Seq.empty
   )
+
+
+
+
+
